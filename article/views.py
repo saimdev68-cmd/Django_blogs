@@ -102,6 +102,9 @@ class CommentUpdateView(LoginRequiredMixin,generic.UpdateView):
     template_name = "comment_update.html"
     model = Comment
     form_class = CommentForm
+
+    def get_queryset(self):
+        return Comment.objects.filter(profile=self.request.user.profile)
     
     def get_success_url(self):
         return reverse("article:detail",kwargs={"pk":self.object.article.pk})
@@ -114,6 +117,9 @@ class CommentUpdateView(LoginRequiredMixin,generic.UpdateView):
 class CommentDeleteView(LoginRequiredMixin,generic.DeleteView):
     model = Comment
     
+    def get_queryset(self):
+        return Comment.objects.filter(profile=self.request.user.profile)
+
     def get_success_url(self):
         return reverse("article:detail",kwargs={"pk":self.object.article.pk})
     
