@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Update Profile | Modern Read{% endblock %}
+
+{% block content %}
+<main class="max-w-4xl mx-auto px-4 py-12 md:py-20">
+    <div class="mb-12">
+        <a href="{% url 'accounts:profile_detail' %}" class="text-xs font-bold text-gray-400 uppercase tracking-widest hover:text-black transition-colors flex items-center gap-2">
+            <i class="fa-solid fa-arrow-left text-[10px]"></i> Back to Profile
+        </a>
+        <h1 class="text-3xl font-bold text-gray-900 mt-4">Edit Profile</h1>
+    </div>
+    <form action="" method="post" enctype="multipart/form-data" class="grid grid-cols-1 md:grid-cols-3 gap-12">
+        {% csrf_token %}
+        <div class="md:col-span-1 space-y-8">
+            <div class="bg-gray-50 p-6 rounded-sm border border-gray-100 text-center">
+                <div class="mb-4">
+                    <img src="{{ user.profile.profile_image.url }}" 
+                         class="w-32 h-32 rounded-full object-cover mx-auto border-4 border-white shadow-sm" 
+                         alt="{{ profile.name }}">
+                </div>
+                <p class="text-xs font-bold text-gray-500 uppercase tracking-tight mb-4">Change Photo</p>
+                <div class="django-form-container profile-image-input">
+                    {{ profile_form.profile_image }}
+                </div>
+            </div>
+            <button type="submit" class="w-full bg-black text-white font-bold py-3 uppercase tracking-widest text-xs hover:bg-gray-800 transition-colors shadow-sm">
+                Save Changes
+            </button>
+            <a href="{% url 'accounts:profile_detail' %}" class="block text-center text-xs font-bold text-gray-400 uppercase tracking-widest hover:text-red-500 transition-colors">
+                Cancel
+            </a>
+        </div>
+        <div class="md:col-span-2 space-y-8">
+            <div class="django-form-container">
+                <h3 class="text-xs font-bold uppercase tracking-widest text-blue-600 mb-6 border-b border-gray-100 pb-2">Account Information</h3>
+                {{ user_form.as_p }}
+            </div>
+            <div class="django-form-container mt-10">
+                <h3 class="text-xs font-bold uppercase tracking-widest text-blue-600 mb-6 border-b border-gray-100 pb-2">Personal Details</h3>
+                {{ profile_form.name }}
+                {% if profile_form.bio %}
+                    <p>
+                        <label for="{{ profile_form.bio.id_for_label }}">Bio</label>
+                        {{ profile_form.bio }}
+                    </p>
+                {% endif %}
+            </div>
+        </div>
+    </form>
+</main>
+{% endblock %}

@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+
+{% block title %}{{ article.title }} | Modern Read{% endblock %}
+
+{% block content %}
+<main class="max-w-3xl mx-auto px-4 py-12 md:py-20">
+    <header class="mb-12 text-center">
+        <p class="text-xs font-bold text-blue-600 uppercase tracking-widest mb-4">{{ article.category.name }}</p>
+        <h1 class="text-4xl md:text-5xl font-bold tracking-tight text-gray-900 mb-6 leading-tight">
+            {{ article.title }}
+        </h1>
+        <div class="flex items-center justify-center text-sm text-gray-500 gap-3 mb-8">
+            <span>{{ article.published_at|date }}</span>
+            <span>•</span>
+            <span>{{ article.read_min }} min read</span>
+        </div>
+        <div class="flex items-center justify-center gap-6 py-4 border-y border-gray-100 mb-8">
+            <form action="{% url 'article:like' article.id %}" method="post" class="flex items-center gap-2">
+                {% csrf_token %}
+                <button type="submit" class="group flex items-center gap-2 transition-colors {% if user.profile in article.likes.all %}text-red-500{% else %}text-gray-400 hover:text-red-500{% endif %}">
+                    <i class="{% if user.profile in article.likes.all %}fa-solid{% else %}fa-regular{% endif %} fa-heart text-xl"></i>
+                    <span class="text-sm font-bold text-gray-900">{{ total_likes }}</span>
+                </button>
+            </form>
+            <div class="flex items-center gap-2 text-gray-400">
+                <i class="fa-regular fa-comment text-xl"></i>
+                <span class="text-sm font-bold text-gray-900">{{ total_comments }}</span>
+            </div>
+            <form action="{% url 'article:bookmark' article.id %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="group transition-colors {% if user.profile in article.save.all %}text-blue-600{% else %}text-gray-400 hover:text-blue-600{% endif %}">
+                    <i class="{% if user.profile in article.save.all %}fa-solid{% else %}fa-regular{% endif %} fa-bookmark text-xl"></i>
+                </button>
+            </form>
+        </div>
+    </header>
+    <div class="mb-12">
+        <img src="{{ article.cover_image.url }}" class="w-full h-auto object-cover rounded-sm shadow-sm" alt="{{ article.title }}">
+    </div>
+    <article class="prose prose-lg max-w-none mb-20">
+        <div class="text-xl text-gray-600 leading-relaxed mb-10 italic">
+            {{ article.description|linebreaksbr }}
+        </div>
+        <div class="space-y-10">
+            {% for paragraph in article.paragraph.all %}
+            <div class="paragraph">
+                {% if paragraph.heading %}
+                    <h3 class="text-2xl font-bold text-gray-900 mb-4">{{ paragraph.heading }}</h3>
+                {% endif %}
+                {% if paragraph.is_bullet %}
+                    <ul class="list-disc list-outside pl-5 space-y-2 text-gray-700 leading-relaxed">
+                        {% for line in paragraph.description.splitlines %}
+                            {% if line.strip %}
+                                <li>{{ line }}</li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-gray-700 leading-relaxed whitespace-pre-line">
+                        {{ paragraph.description|linebreaksbr }}
+                    </p>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </article>
+    <section class="mt-16 pt-12 border-t border-gray-900">
+        <h3 class="text-2xl font-bold text-gray-900 mb-8 uppercase tracking-tighter">Discussion ({{ total_comments }})</h3>
+        <div class="mb-12 bg-gray-50 p-6 rounded-sm">
+            <form action="" method="post" class="space-y-4">
+                {% csrf_token %}
+                <div class="comment-form-container">
+                    {{ form.as_p }}
+                </div>
+                <button type="submit" class="bg-black text-white px-6 py-2 text-xs font-bold uppercase tracking-widest hover:bg-gray-800 transition-colors">
+                    Post Comment
+                </button>
+            </form>
+        </div>
+        <div class="space-y-8 mb-12">
+            {% for comment in comments %}
+            <div class="flex gap-4 pb-8 border-b border-gray-50 last:border-0">
+                <img src="{{ comment.profile.profile_image.url }}" class="w-10 h-10 rounded-full object-cover" alt="{{ comment.profile.name }}">
+                <div class="flex-1">
+                    <div class="flex items-center justify-between mb-1">
+                        <div class="flex items-center gap-2">
+                            <span class="font-bold text-sm text-gray-900">{{ comment.profile.name }}</span>
+                            <span class="text-[10px] text-gray-400 uppercase font-bold tracking-tighter">{{ comment.created_at|timesince }} ago</span>
+                        </div>
+                        {% if comment.profile == user.profile %}
+                        <div class="flex items-center gap-3">
+                            <a href="{% url 'article:comment_update' comment.id %}" class="text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-blue-600 transition-colors">
+                                Edit
+                            </a>
+                            <form action="{% url 'article:comment_delete' comment.id %}" method="post" onsubmit="return confirm('Delete this comment?');">
+                                {% csrf_token %}
+                                <button type="submit" class="text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-red-500 transition-colors">
+                                    Delete
+                                </button>
+                            </form>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <p class="text-gray-600 leading-relaxed text-sm">{{ comment.text }}</p>
+                </div>
+            </div>
+            {% empty %}
+            <p class="text-center text-gray-400 py-10 italic">No comments yet. Start the conversation!</p>
+            {% endfor %}
+        </div>
+        {% if comments.paginator.num_pages > 1 %}
+        <nav class="flex items-center justify-center gap-1 pt-8 border-t border-gray-100">
+            {% if comments.has_previous %}
+                <a href="?page={{ comments.previous_page_number }}" class="p-2 text-gray-400 hover:text-black transition-colors">
+                    <i class="fa-solid fa-chevron-left text-xs"></i>
+                </a>
+            {% endif %}
+            {% if comments.number > 3 %}
+                <a href="?page=1" class="w-9 h-9 flex items-center justify-center hover:bg-gray-50 text-xs font-bold transition-colors">1</a>
+                {% if comments.number > 4 %}
+                    <span class="w-9 h-9 flex items-center justify-center text-gray-300 text-xs">...</span>
+                {% endif %}
+            {% endif %}
+            {% for num in comments.paginator.page_range %}
+                {% if num == comments.number %}
+                    <span class="w-9 h-9 flex items-center justify-center bg-black text-white text-xs font-bold shadow-sm">{{ num }}</span>
+                {% elif num >= comments.number|add:"-2" and num <= comments.number|add:"2" %}
+                    <a href="?page={{ num }}" class="w-9 h-9 flex items-center justify-center hover:bg-gray-50 text-xs font-bold transition-colors">{{ num }}</a>
+                {% endif %}
+            {% endfor %}
+            {% if comments.number < comments.paginator.num_pages|add:"-2" %}
+                {% if comments.number < comments.paginator.num_pages|add:"-3" %}
+                    <span class="w-9 h-9 flex items-center justify-center text-gray-300 text-xs">...</span>
+                {% endif %}
+                <a href="?page={{ comments.paginator.num_pages }}" class="w-9 h-9 flex items-center justify-center hover:bg-gray-50 text-xs font-bold transition-colors">
+                    {{ comments.paginator.num_pages }}
+                </a>
+            {% endif %}
+            {% if comments.has_next %}
+                <a href="?page={{ comments.next_page_number }}" class="p-2 text-gray-400 hover:text-black transition-colors">
+                    <i class="fa-solid fa-chevron-right text-xs"></i>
+                </a>
+            {% endif %}
+        </nav>
+        {% endif %}
+    </section>
+</main>
+
+{% endblock %}

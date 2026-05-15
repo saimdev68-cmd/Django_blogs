@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Profile | {{ profile.name }}{% endblock %}
+
+{% block content %}
+<main class="max-w-4xl mx-auto px-4 py-12 md:py-20">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+        <aside class="md:col-span-1 space-y-8 order-2 md:order-1">
+            <div class="border-t border-gray-100 pt-8">
+                <h4 class="text-xs font-bold uppercase tracking-widest text-gray-400 mb-6">Account Settings</h4>
+                <nav class="flex flex-col gap-4 text-sm font-medium">
+                    <a href="{% url "accounts:profile_update" %}" class="text-gray-900 hover:text-blue-600 transition-colors">Edit Profile</a>
+                    <a href="{% url "accounts:email_update" %}" class="text-gray-900 hover:text-blue-600 transition-colors">Edit Email Address</a>
+                    <a href="{% url "article:bookmark_list" %}" class="text-gray-900 hover:text-blue-600 transition-colors">View Read Later List</a>
+                    <a href="{% url "accounts:password_change" %}" class="text-gray-900 hover:text-blue-600 transition-colors">Change Password</a>
+                </nav>
+            </div>
+            <div class="pt-4">
+                <form action="{% url 'accounts:logout' %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="text-sm font-bold text-red-500 hover:text-red-700 uppercase tracking-widest transition-colors">
+                        Logout
+                    </button>
+                </form>
+            </div>
+        </aside>
+        <section class="md:col-span-2 order-1 md:order-2">
+            <div class="flex flex-col sm:flex-row items-center sm:items-start gap-8 mb-12">
+                <div class="shrink-0">
+                    <img src="{{ profile.profile_image.url }}" 
+                         class="w-32 h-32 rounded-full object-cover border-4 border-gray-50 shadow-sm" 
+                         alt="{{ profile.name }}">
+                </div>
+                <div class="text-center sm:text-left">
+                    <p class="text-xs font-bold text-blue-600 uppercase tracking-widest mb-2">User Profile</p>
+                    <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-1">{{ profile.name }}</h1>
+                    <p class="text-gray-500 font-medium">@{{ profile.user.username }}</p>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 gap-6 border-t border-gray-100 pt-10">
+                <div class="flex flex-col gap-1">
+                    <span class="text-xs font-bold uppercase tracking-widest text-gray-400">Full Name</span>
+                    <p class="text-lg text-gray-900">{{ profile.name }}</p>
+                </div>
+                <div class="flex flex-col gap-1">
+                    <span class="text-xs font-bold uppercase tracking-widest text-gray-400">Email Address</span>
+                    <p class="text-lg text-gray-900">{{ profile.user.email }}</p>
+                </div>
+                <div class="flex flex-col gap-1">
+                    <span class="text-xs font-bold uppercase tracking-widest text-gray-400">Account Status</span>
+                    <p class="text-sm">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            Active Member
+                        </span>
+                    </p>
+                </div>
+            </div>
+        </section>
+    </div>
+</main>
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Login | Modern Read{% endblock %}
+
+{% block content %}
+<main class="min-h-[80vh] flex items-center justify-center px-4 py-12">
+    <div class="w-full max-w-md">
+        <div class="text-center mb-10">
+            <p class="text-xs font-bold text-blue-600 uppercase tracking-widest mb-2">Welcome Back</p>
+            <h1 class="text-3xl font-bold text-gray-900">Login to your account</h1>
+        </div>
+        <div class="bg-white border border-gray-100 rounded-sm p-8 shadow-sm">
+            <form action="" method="post" class="space-y-6">
+                {% csrf_token %}
+                <div class="django-form-container">
+                    {{ form.as_p }}
+                </div>
+                <button type="submit" class="w-full bg-black text-white font-bold py-3 uppercase tracking-widest text-xs hover:bg-gray-800 transition-colors shadow-sm">
+                    Login
+                </button>
+            </form>
+            <div class="mt-8 pt-6 border-t border-gray-50 text-center space-y-3">
+                <a href="{% url 'accounts:signup' %}" class="block text-sm font-medium text-gray-500 hover:text-black transition-colors">
+                    Don't have an account? <span class="text-blue-600 font-bold">Signup</span>
+                </a>
+                <a href="{% url 'accounts:password_reset' %}" class="block text-sm font-medium text-gray-400 hover:text-gray-900 transition-colors italic">
+                    Forgot Password?
+                </a>
+            </div>
+        </div>
+        <p class="text-center text-xs text-gray-400 mt-8 leading-relaxed px-6">
+            Secure login with industry-standard encryption.
+        </p>
+    </div>
+</main>
+{% endblock %}

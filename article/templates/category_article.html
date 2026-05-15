@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Category | Modern Read{% endblock %}
+
+{% block content %}
+<main class="max-w-4xl mx-auto px-4 py-12">
+    <div class="flex items-center justify-end gap-6 mb-12 border-b border-gray-100 pb-4">
+        <span class="text-xs font-bold uppercase tracking-widest text-gray-400">Sort by:</span>
+        <div class="flex gap-4">
+            <a href="?order=new{% if request.GET.q %}&q={{request.GET.q}}{% endif %}" class="text-xs font-bold uppercase tracking-widest hover:text-blue-600 transition {% if request.GET.order == 'new' or not request.GET.order %}text-black{% else %}text-gray-400{% endif %}">Newest</a>
+            <a href="?order=old{% if request.GET.q %}&q={{request.GET.q}}{% endif %}" class="text-xs font-bold uppercase tracking-widest hover:text-blue-600 transition {% if request.GET.order == 'old' %}text-black{% else %}text-gray-400{% endif %}">Oldest</a>
+        </div>
+    </div>
+    <div class="flex flex-col gap-12">
+        {% for article in articles %}
+        <div class="flex flex-col md:flex-row gap-8 items-start group">
+            <div class="flex-1 order-2 md:order-1">
+                <p class="text-xs font-bold text-gray-600 mb-2">{{ article.category.name }}</p>
+                <a href="{% url 'article:detail' article.id %}">
+                    <h2 class="text-2xl font-bold mb-2 group-hover:underline leading-tight text-gray-900">
+                        {{ article.title }}
+                    </h2>
+                </a>
+                <div class="flex items-center text-sm text-gray-500 gap-2">
+                    <span>{{ article.published_at|date }}</span>
+                    <span>•</span>
+                    <span>{{ article.read_min }} min read</span>
+                </div>
+            </div>
+            <div class="w-full md:w-48 h-32 order-1 md:order-2 shrink-0">
+                <img src="{{ article.cover_image.url }}" class="w-full h-full object-cover rounded-sm" alt="{{ article.title }}">
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="mt-20 pt-10 border-t border-gray-100 flex items-center justify-center gap-4 text-sm font-medium">
+        {% if page_obj.has_previous %}
+            <a href="?page={{page_obj.previous_page_number}}{% if request.GET.order %}&order={{request.GET.order}}{% endif %}{% if request.GET.q %}&q={{request.GET.q}}{% endif %}" class="text-gray-900 hover:text-blue-600">Previous</a>
+        {% else %}
+            <span class="text-gray-300">Previous</span>
+        {% endif %}
+        <div class="flex items-center gap-3">
+            {% if page_obj.number > 3 %}
+                <a href="?page=1{% if request.GET.order %}&order={{request.GET.order}}{% endif %}{% if request.GET.q %}&q={{request.GET.q}}{% endif %}" class="hover:text-blue-600">1</a>
+                {% if page_obj.number > 4 %}
+                    <span class="text-gray-400">...</span>
+                {% endif %}
+            {% endif %}
+            {% for num in page_obj.paginator.page_range %}
+                {% if num >= page_obj.number|add:"-2" and num <= page_obj.number|add:"2" %}
+                    {% if num == page_obj.number %}
+                        <span class="text-blue-600 font-bold border-b-2 border-blue-600 pb-1">{{num}}</span>
+                    {% else %}
+                        <a href="?page={{num}}{% if request.GET.order %}&order={{request.GET.order}}{% endif %}{% if request.GET.q %}&q={{request.GET.q}}{% endif %}" class="text-gray-500 hover:text-black">{{num}}</a>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+            {% if page_obj.number < page_obj.paginator.num_pages|add:"-2" %}
+                {% if page_obj.number < page_obj.paginator.num_pages|add:"-3" %}
+                    <span class="text-gray-400">...</span>
+                {% endif %}
+                <a href="?page={{page_obj.paginator.num_pages}}{% if request.GET.order %}&order={{request.GET.order}}{% endif %}{% if request.GET.q %}&q={{request.GET.q}}{% endif %}" class="hover:text-blue-600">{{page_obj.paginator.num_pages}}</a>
+            {% endif %}
+        </div>
+        {% if page_obj.has_next %}
+            <a href="?page={{page_obj.next_page_number}}{% if request.GET.order %}&order={{request.GET.order}}{% endif %}{% if request.GET.q %}&q={{request.GET.q}}{% endif %}" class="text-gray-900 hover:text-blue-600">Next</a>
+        {% else %}
+            <span class="text-gray-300">Next</span>
+        {% endif %}
+    </div>
+</main>
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Verify Email | Modern Read{% endblock %}
+
+{% block content %}
+<main class="min-h-[80vh] flex items-center justify-center px-4 py-12">
+    <div class="w-full max-w-md">
+        <div class="text-center mb-10">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-blue-50 text-blue-600 rounded-full mb-6">
+                <i class="fa-solid fa-envelope-open-text text-2xl"></i>
+            </div>
+            <p class="text-xs font-bold text-blue-600 uppercase tracking-widest mb-2">Final Step</p>
+            <h1 class="text-3xl font-bold text-gray-900">Verify your Email</h1>
+            <p class="text-sm text-gray-500 mt-2 px-6">We've sent a code to your new email address. Enter it below to confirm the change.</p>
+        </div>
+        <div class="bg-white border border-gray-100 rounded-sm p-8 shadow-sm">
+            <form action="" method="post" class="space-y-6">
+                {% csrf_token %}    
+                <div class="django-form-container">
+                    {{ form.as_p }}
+                </div>
+                <button type="submit" class="w-full bg-black text-white font-bold py-3 uppercase tracking-widest text-xs hover:bg-gray-800 transition-colors shadow-sm">
+                    Confirm Verification
+                </button>
+            </form>
+            <div class="mt-8 pt-6 border-t border-gray-50 flex flex-col items-center gap-4">
+                <form action="{% url 'accounts:email_otp_resend' %}" method="post" class="w-full">
+                    {% csrf_token %}
+                    <button type="submit" class="w-full py-2 text-sm font-bold text-gray-900 border border-gray-200 rounded-sm hover:bg-gray-50 transition-colors uppercase tracking-tight">
+                        Resend Code
+                    </button>
+                </form>
+                <a href="{% url 'accounts:profile_detail' %}" class="text-xs font-medium text-gray-400 hover:text-black transition-colors uppercase tracking-widest">
+                    Cancel Update
+                </a>
+            </div>
+        </div>
+        <p class="text-center text-xs text-gray-400 mt-8 leading-relaxed px-10">
+            If you don't see the email, please check your spam or promotions folder before requesting a new code.
+        </p>
+    </div>
+</main>
+{% endblock %}
